@@ -1,14 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="viewport" content="initial-scale=1, user-scalable=no, maximum-scale=1, width=device-width">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
+    <!-- Polyfill for older browsers -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="./resources/ol.css">
-    <link rel="stylesheet" href="resources/fontawesome-all.min.css">
+    <!-- Font Awesome via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-ZwL+1lV...==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="resources/horsey.min.css">
     <link rel="stylesheet" type="text/css" href="resources/ol3-search-layer.min.css">
     <link href="resources/ol-geocoder.min.css" rel="stylesheet">
@@ -27,16 +32,21 @@
         #map {
             width: 100%;
             height: 100%;
-            display: none; /* hidden until password is correct */
+            display: none;
         }
 
-        /* Password overlay */
         #password-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #ffffff;
+            display: -webkit-flex;
+            display: -ms-flexbox;
             display: flex;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
             align-items: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
             justify-content: center;
             z-index: 9999;
         }
@@ -91,6 +101,13 @@
 </head>
 <body>
 
+    <!-- JavaScript Disabled Message -->
+    <noscript>
+        <div style="text-align:center; padding:2rem; background:#ffe0e0; color:#900;">
+            This site requires JavaScript. Please enable it in your browser settings.
+        </div>
+    </noscript>
+
     <!-- Password Screen -->
     <div id="password-screen">
         <div id="password-box">
@@ -110,19 +127,17 @@
         </div>
     </div>
 
-    <!-- Map Scripts -->
-    <script>
-        const correctPassword = "1234"; // Change to your desired password
+    <!-- Password Check & Map Loading -->
+    <script type="text/javascript">
+        var correctPassword = "1234"; // Set your password here
 
         function checkPassword() {
-            const userInput = document.getElementById("password-input").value;
-            const errorMessage = document.getElementById("error-message");
+            var userInput = document.getElementById("password-input").value;
+            var errorMessage = document.getElementById("error-message");
 
             if (userInput === correctPassword) {
                 document.getElementById("password-screen").style.display = "none";
                 document.getElementById("map").style.display = "block";
-
-                // Dynamically load your map scripts
                 loadMapScripts();
             } else {
                 errorMessage.textContent = "Incorrect password.";
@@ -130,33 +145,34 @@
         }
 
         function loadMapScripts() {
-    const scripts = [
-        "resources/qgis2web_expressions.js",
-        "./resources/functions.js",
-        "./resources/ol.js",
-        "resources/horsey.min.js",
-        "resources/ol3-search-layer.js",
-        "./resources/ol-layerswitcher.js",
-        "resources/ol-geocoder.js",
-        "layers/EGPIP2025_1.js",
-        "styles/EGPIP2025_1_style.js",
-        "./layers/layers.js",
-        "./resources/Autolinker.min.js",
-        "./resources/qgis2web.js"
-    ];
+            var scripts = [
+                "resources/qgis2web_expressions.js",
+                "resources/functions.js",
+                "resources/ol.js",
+                "resources/horsey.min.js",
+                "resources/ol3-search-layer.js",
+                "resources/ol-layerswitcher.js",
+                "resources/ol-geocoder.js",
+                "layers/EGPIP2025_1.js",
+                "styles/EGPIP2025_1_style.js",
+                "layers/layers.js",
+                "resources/Autolinker.min.js",
+                "resources/qgis2web.js"
+            ];
 
-    // Load scripts one at a time, in sequence
-    function loadSequential(index) {
-        if (index >= scripts.length) return;
+            function loadSequential(index) {
+                if (index >= scripts.length) return;
 
-        const script = document.createElement("script");
-        script.src = scripts[index];
-        script.onload = () => loadSequential(index + 1); // Load next after this one
-        document.body.appendChild(script);
-    }
+                var script = document.createElement("script");
+                script.src = scripts[index];
+                script.onload = function() {
+                    loadSequential(index + 1);
+                };
+                document.body.appendChild(script);
+            }
 
-    loadSequential(0);
-}
+            loadSequential(0);
+        }
     </script>
 </body>
 </html>
