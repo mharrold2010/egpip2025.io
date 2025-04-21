@@ -1,132 +1,162 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="./resources/ol.css">
-  <link rel="stylesheet" href="resources/fontawesome-all.min.css">
-  <link rel="stylesheet" type="text/css" href="resources/horsey.min.css">
-  <link rel="stylesheet" type="text/css" href="resources/ol3-search-layer.min.css">
-  <link href="resources/ol-geocoder.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="./resources/ol-layerswitcher.css">
-  <link rel="stylesheet" href="./resources/qgis2web.css">
-  <style>
-    html, body, #map {
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
-    html, body {
-      background-color: #ffffff;
-    }
-    .ol-control > * {
-      background-color: #f8f8f8!important;
-      color: #444444!important;
-      border-radius: 0px;
-    }
-    .ol-attribution a, .gcd-gl-input::placeholder, .search-layer-input-search::placeholder {
-      color: #444444!important;
-    }
-    .search-layer-input-search {
-      background-color: #f8f8f8!important;
-    }
-    .ol-control > *:focus, .ol-control >*:hover {
-      background-color: rgba(248, 248, 248, 0.7)!important;
-    }
-    .ol-control {
-      background-color: rgba(255,255,255,.4) !important;
-      padding: 2px !important;
-    }
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
-    #passwordContainer {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(255, 255, 255, 0.95);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
+    <link rel="stylesheet" href="./resources/ol.css">
+    <link rel="stylesheet" href="resources/fontawesome-all.min.css">
+    <link rel="stylesheet" type="text/css" href="resources/horsey.min.css">
+    <link rel="stylesheet" type="text/css" href="resources/ol3-search-layer.min.css">
+    <link href="resources/ol-geocoder.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./resources/ol-layerswitcher.css">
+    <link rel="stylesheet" href="./resources/qgis2web.css">
 
-    #passwordBox {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            font-family: sans-serif;
+            height: 100%;
+        }
 
-    #passwordBox input {
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+        #map {
+            width: 100%;
+            height: 100%;
+            display: none; /* hidden until password is correct */
+        }
 
-    #passwordBox button {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      border: none;
-      background-color: #007BFF;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+        /* Password overlay */
+        #password-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
 
-    #passwordBox button:hover {
-      background-color: #0056b3;
-    }
-  </style>
-  <title>Password Protected Map</title>
+        #password-box {
+            text-align: center;
+            background: #f0f0f0;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        #password-box input {
+            padding: 10px;
+            width: 200px;
+            margin-top: 10px;
+        }
+
+        #password-box button {
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+
+        .ol-control > * {
+            background-color: #f8f8f8 !important;
+            color: #444444 !important;
+            border-radius: 0px;
+        }
+
+        .ol-attribution a,
+        .gcd-gl-input::placeholder,
+        .search-layer-input-search::placeholder {
+            color: #444444 !important;
+        }
+
+        .search-layer-input-search {
+            background-color: #f8f8f8 !important;
+        }
+
+        .ol-control > *:focus,
+        .ol-control > *:hover {
+            background-color: rgba(248, 248, 248, 0.7) !important;
+        }
+
+        .ol-control {
+            background-color: rgba(255, 255, 255, .4) !important;
+            padding: 2px !important;
+        }
+    </style>
+
+    <title>Password Protected Map</title>
 </head>
-
 <body>
-  <div id="passwordContainer">
-    <div id="passwordBox">
-      <h2>Enter Password</h2>
-      <input type="password" id="passwordInput" placeholder="Password">
-      <button onclick="checkPassword()">Submit</button>
+
+    <!-- Password Screen -->
+    <div id="password-screen">
+        <div id="password-box">
+            <h2>Enter Password</h2>
+            <input type="password" id="password-input" placeholder="Enter password">
+            <br>
+            <button onclick="checkPassword()">Submit</button>
+            <p id="error-message" style="color: red;"></p>
+        </div>
     </div>
-  </div>
 
-  <div id="map" style="display:none;">
-    <div id="popup" class="ol-popup">
-      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-      <div id="popup-content"></div>
+    <!-- Map -->
+    <div id="map">
+        <div id="popup" class="ol-popup">
+            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+            <div id="popup-content"></div>
+        </div>
     </div>
-  </div>
 
-  <!-- Scripts -->
-  <script>
-    function checkPassword() {
-      const password = document.getElementById("passwordInput").value;
-      const correctPassword = "mypassword"; // <-- Change this!
+    <!-- Map Scripts -->
+    <script>
+        const correctPassword = "1234"; // Change to your desired password
 
-      if (password === correctPassword) {
-        document.getElementById("passwordContainer").style.display = "none";
-        document.getElementById("map").style.display = "block";
-      } else {
-        alert("Incorrect password. Please try again.");
-      }
+        function checkPassword() {
+            const userInput = document.getElementById("password-input").value;
+            const errorMessage = document.getElementById("error-message");
+
+            if (userInput === correctPassword) {
+                document.getElementById("password-screen").style.display = "none";
+                document.getElementById("map").style.display = "block";
+
+                // Dynamically load your map scripts
+                loadMapScripts();
+            } else {
+                errorMessage.textContent = "Incorrect password.";
+            }
+        }
+
+        function loadMapScripts() {
+    const scripts = [
+        "resources/qgis2web_expressions.js",
+        "./resources/functions.js",
+        "./resources/ol.js",
+        "resources/horsey.min.js",
+        "resources/ol3-search-layer.js",
+        "./resources/ol-layerswitcher.js",
+        "resources/ol-geocoder.js",
+        "layers/EGPIP2025_1.js",
+        "styles/EGPIP2025_1_style.js",
+        "./layers/layers.js",
+        "./resources/Autolinker.min.js",
+        "./resources/qgis2web.js"
+    ];
+
+    // Load scripts one at a time, in sequence
+    function loadSequential(index) {
+        if (index >= scripts.length) return;
+
+        const script = document.createElement("script");
+        script.src = scripts[index];
+        script.onload = () => loadSequential(index + 1); // Load next after this one
+        document.body.appendChild(script);
     }
-  </script>
 
-  <script src="resources/qgis2web_expressions.js"></script>
-  <script src="./resources/functions.js"></script>
-  <script src="./resources/ol.js"></script>
-  <script src="resources/horsey.min.js"></script>
-  <script src="resources/ol3-search-layer.js"></script>
-  <script src="./resources/ol-layerswitcher.js"></script>
-  <script src="resources/ol-geocoder.js"></script>
-  <script src="layers/EGPIP2025_1.js"></script>
-  <script src="styles/EGPIP2025_1_style.js"></script>
-  <script src="./layers/layers.js" type="text/javascript"></script>
-  <script src="./resources/Autolinker.min.js"></script>
-  <script src="./resources/qgis2web.js"></script>
+    loadSequential(0);
+}
+    </script>
 </body>
 </html>
